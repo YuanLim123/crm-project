@@ -13,8 +13,8 @@ class TestController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Client::first()->project->tasks;
-        return $tasks;
+        $task = Client::first()->project->tasks->first();
+        return $task->end_date;
     }
 
     public function addMediaToLibrary(Request $request)
@@ -23,7 +23,6 @@ class TestController extends Controller
             ->create()
             ->addMedia(storage_path('demo/facebook.jpg'))
             ->toMediaCollection();
-
     }
 
 

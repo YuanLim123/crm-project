@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function project(): BelongsTo
     {
@@ -21,5 +23,12 @@ class Task extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected function endDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => date('d/m/Y', strtotime($value)),
+        );
     }
 }
