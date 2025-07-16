@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +57,10 @@ Route::controller(TaskController::class)->group(function () {
     Route::get('/tasks/{task}/edit', 'edit')->name('tasks.edit');
     Route::put('/tasks/{task}', 'update')->name('tasks.update');
     Route::delete('/tasks/{task}', 'destroy')->name('tasks.destroy');
+});
+
+Route::controller(UserController::class)->group(function () {
+    Route::get('/users', 'index')->name('users.index');
 });
 
 Route::get('/test', [TestController::class, 'index']);

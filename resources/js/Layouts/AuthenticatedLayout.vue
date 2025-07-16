@@ -137,13 +137,24 @@ const showingNavigationDropdown = ref(false);
             <div class="flex min-h-screen">
                 <!-- Sidebar -->
                 <aside class="w-48 bg-white text-gray-800 flex flex-col py-8 px-4 rounded-md">
-                    <SideNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                    <SideNavLink
+                        :href="route('dashboard')"
+                        :active="route().current('dashboard')"
+                    >
                         Dashboard
                     </SideNavLink>
-                    <a href="#" class="mb-4 hover:text-gray-300">Users</a>
-                    <a href="#" class="mb-4 hover:text-gray-300">Clients</a>
-                    <a href="#" class="mb-4 hover:text-gray-300">Tasks</a>
-                    <a href="#" class="mb-4 hover:text-gray-300">Projects</a>
+                    <SideNavLink :href="route('users.index')" :active="route().current('users.index')">
+                        Users
+                    </SideNavLink>                    
+                    <SideNavLink :href="route('clients.index')" :active="route().current('clients.index')">
+                        Clients
+                    </SideNavLink>                         
+                    <SideNavLink :href="route('tasks.index')" :active="route().current('tasks.index')">
+                        Tasks
+                    </SideNavLink>                      
+                    <SideNavLink :href="route('projects.index')" :active="route().current('projects.index')">
+                        Projects
+                    </SideNavLink>                
                 </aside>
                 <!-- Page Content -->
                 <main class="flex-1 p-6">

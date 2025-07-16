@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use Inertia\Inertia;
 
-class TaskController extends Controller
+
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Task/Index', [
+        $users = User::all();
+        return Inertia::render('User/Index', [
+            'users' => $users,
         ]);
     }
 
