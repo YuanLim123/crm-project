@@ -144,16 +144,16 @@ const showingNavigationDropdown = ref(false);
                         Dashboard
                     </SideNavLink>
                     <SideNavLink :href="route('users.index')" :active="route().current('users.index')">
-                        Users
+                        User
                     </SideNavLink>                    
                     <SideNavLink :href="route('clients.index')" :active="route().current('clients.index')">
-                        Clients
+                        Client
                     </SideNavLink>                         
                     <SideNavLink :href="route('tasks.index')" :active="route().current('tasks.index')">
-                        Tasks
+                        Task
                     </SideNavLink>                      
                     <SideNavLink :href="route('projects.index')" :active="route().current('projects.index')">
-                        Projects
+                        Project
                     </SideNavLink>                
                 </aside>
                 <!-- Page Content -->

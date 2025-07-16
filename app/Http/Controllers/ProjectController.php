@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 
 class ProjectController extends Controller
 {
@@ -12,7 +14,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
+        $projects = Project::with('client')->get();
         return Inertia::render('Project/Index', [
+            'projects' => $projects,
         ]);
     }
 
@@ -37,7 +41,10 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $project = Project::with('client')->findOrFail($id);
+        return Inertia::render('Project/Show', [
+            'project' => $project,
+        ]);
     }
 
     /**
