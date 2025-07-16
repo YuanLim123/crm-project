@@ -32,4 +32,11 @@ class Project extends Model
             get: fn($value) => date('d/m/Y', strtotime($value)),
         );
     }
+
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => date('d/m/Y', strtotime($value)),
+        );
+    }
 }

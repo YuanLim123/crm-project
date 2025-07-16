@@ -34,10 +34,7 @@ defineProps({
                         </div>
                     </div>
                     <div class="flex gap-4 p-6 flex-wrap">
-                        <Information />
-                        <Information />
-                        <Information />
-                        <Information />
+                        <Information :project="project" />
                     </div>
                 </div>
             </div>

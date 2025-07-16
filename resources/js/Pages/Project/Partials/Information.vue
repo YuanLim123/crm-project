@@ -1,4 +1,12 @@
 <script setup>
+
+defineProps({
+    project: {
+        type: Object,
+        required: true
+    }
+});
+
 </script>
 
 <template>
@@ -12,15 +20,15 @@
                     Description
                 </p>
                 <p class="text-sm">
-                    Once your account is deleted, all of its resources and data will
+                    {{ project.description }}
                 </p>
             </div>
             <div class="mt-2 p-2">
                 <p class="mt-1 text-sm text-gray-600">
                     Deadline
                 </p>
-                <p class="text-sm">
-                    Once your account is deleted, all of its resources and data will
+                <p class="text-sm"> 
+                    {{ project.end_date }}
                 </p>
                 
             </div>
@@ -29,15 +37,15 @@
                     Status
                 </p>
                 <p class="text-sm">
-                    Once your account is deleted, all of its resources and data will
+                    {{ project.status }}
                 </p>
-            </div>
+            </div> 
             <div class="mt-2 p-2">
                 <p class="mt-1 text-sm text-gray-600">
                     Created At
                 </p>
                 <p class="text-sm">
-                    Once your account is deleted, all of its resources and data will
+                    {{ project.created_at }}
                 </p>
             </div>
         </header>
