@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Link } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
 
 defineProps({
@@ -50,8 +51,9 @@ defineProps({
                                         {{ project.end_date ? project.end_date : '' }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="#"
-                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                        <Link :href="route('projects.show', project.id)"
+                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline">View
+                                        </Link>
                                     </td>
                                 </tr>
                             </tbody>
