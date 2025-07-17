@@ -17,11 +17,11 @@ defineProps({
     <AuthenticatedLayout>
         <div class="py-8">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg ">
+                    <div class="px-2 py-4 text-gray-900 border-b-2 border-gray-200">
                         Project Page
                     </div>
-                    <div class="mx-8 mb-8 relative overflow-x-auto shadow-md sm:rounded-lg">
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left rtl:text-right">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>

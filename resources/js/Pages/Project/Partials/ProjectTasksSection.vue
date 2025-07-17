@@ -12,12 +12,12 @@ defineProps({
 <template>
     <section class="flex flex-col grow border-2 border-solid border-gray-300 rounded-lg basis-full">
         <header>
-            <h2 class="text-lg font-medium text-gray-900 bg-gray-100 p-2">
+            <h2 class="text-lg font-medium text-gray-900 bg-gray-100 p-2 border-b-2 border-gray-200">
                 Project Tasks
             </h2>
             <div class=" overflow-x-auto shadow-md">
                 <table class="w-full text-sm text-left rtl:text-right">
-                    <thead class="text-xs text-gray-500 uppercase bg-gray-100">
+                    <thead class="text-xs text-gray-500 uppercase bg-gray-100 border-b-2 border-gray-200">
                         <tr>
                             <th scope="col" class="px-6 py-3">
                                 Task
