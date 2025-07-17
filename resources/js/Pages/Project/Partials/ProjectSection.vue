@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-    <section class="flex flex-col grow border-2 border-solid border-gray-300 rounded-lg">
+    <section class="flex flex-col grow border-2 border-solid border-gray-300 rounded-lg basis-1/3">
         <header>
             <h2 class="text-lg font-medium text-gray-900 bg-gray-100 p-2">
                 Project Information

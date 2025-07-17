@@ -45,7 +45,7 @@ defineProps({
                                         {{ project.title }}
                                     </th>
                                     <td class="px-6 py-4">
-                                        {{ project.client ? project.client.name : '' }}
+                                        {{ project.client ? project.client.contact_person : '' }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ project.end_date ? project.end_date : '' }}

@@ -41,7 +41,7 @@ defineProps({
                             <tbody>
                                 <tr v-for="client in clients" :key="client.id" class="bg-white border-b">
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                        {{ client.name }}
+                                        {{ client.contact_person }}
                                     </th>
                                     <td class="px-6 py-4">
                                         {{ client.email }}

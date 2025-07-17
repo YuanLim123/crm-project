@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Client;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
@@ -18,6 +18,7 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::inRandomOrder()->first()->id, // Randomly assign a existing user
             'title' => fake()->word(),
             'description' => fake()->sentence(),
             'end_date' => fake()->dateTimeBetween('now', '+1 month'),

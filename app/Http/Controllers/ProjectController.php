@@ -41,7 +41,7 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        $project = Project::with('client')->findOrFail($id);
+        $project = Project::with(['client', 'user', 'tasks'])->findOrFail($id);
         return Inertia::render('Project/Show', [
             'project' => $project,
         ]);
