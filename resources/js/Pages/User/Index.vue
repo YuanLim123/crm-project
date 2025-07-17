@@ -101,11 +101,16 @@ const submit = function () {
                                     <td class="px-6 py-4">
                                         {{ user.email }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 flex gap-2">
                                         <a
                                             href="#"
                                             class="font-medium text-blue-600 hover:underline dark:text-blue-500"
                                             >Edit</a
+                                        >
+                                        <a
+                                            href="#"
+                                            class="font-medium text-red-600 hover:underline dark:text-red-500"
+                                            >Delete</a
                                         >
                                     </td>
                                 </tr>
