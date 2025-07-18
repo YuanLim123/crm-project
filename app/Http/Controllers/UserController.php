@@ -14,9 +14,13 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $users = User::query()
+                ->when($request->showDeleted, function ($q) {
+                    $q->onlyTrashed();
+                })
+                ->get();
         return Inertia::render('User/Index', [
             'users' => $users,
         ]);
@@ -79,6 +83,15 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        
+        // Ensure the user is not trying to delete themselves
+        if ($user->id === auth()->user()->id) {
+            return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }
