@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 defineProps({
     projects: {
@@ -20,6 +21,11 @@ defineProps({
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg ">
                     <div class="px-2 py-4 text-gray-900 border-b-2 border-gray-200">
                         Project Page
+                    </div>
+                    <div class="flex flex-col gap-2 px-2 py-4">
+                        <PrimaryButton class="w-32"
+                            >Add Project</PrimaryButton
+                        >
                     </div>
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                         <table class="w-full text-sm text-left rtl:text-right">
