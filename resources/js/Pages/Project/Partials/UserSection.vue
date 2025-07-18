@@ -3,7 +3,6 @@
 defineProps({
     user: {
         type: Object,
-        required: true
     }
 });
 
@@ -20,7 +19,7 @@ defineProps({
                     Name
                 </p>
                 <p class="text-sm">
-                    {{ user.name }}
+                    {{ user ? user.name : 'TBA' }}
                 </p>
             </div>
             <div class="mt-2 p-2">
@@ -28,7 +27,7 @@ defineProps({
                     Email
                 </p>
                 <p class="text-sm"> 
-                    {{ user.email }}
+                    {{ user ? user.email : 'TBA' }}
                 </p>
                 
             </div>
@@ -37,7 +36,7 @@ defineProps({
                     Phone
                 </p>
                 <p class="text-sm">
-                    {{ user.phone }}
+                    {{ user ? user.phone : 'TBA' }}
                 </p>
             </div> 
         </header>

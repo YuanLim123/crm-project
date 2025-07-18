@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
@@ -75,7 +76,26 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $attributes = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($id),
+            ],
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'name' => $attributes['name'],
+            'email' => $attributes['email'],
+        ]);
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 
     /**

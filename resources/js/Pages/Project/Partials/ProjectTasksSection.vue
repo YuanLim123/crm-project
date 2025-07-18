@@ -42,7 +42,7 @@ defineProps({
                                 {{ task.title }}
                             </th>
                             <td class="px-6 py-4">
-                                {{ task.user.name }}
+                                {{ task.user ? task.user.name : 'TBA' }}
                             </td>
                             <td class="px-6 py-4">
                                 {{ task.status}}

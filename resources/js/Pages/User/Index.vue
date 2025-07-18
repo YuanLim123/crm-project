@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DeleteUserModal from './Partials/DeleteUserModal.vue';
 import AddUserModal from './Partials/AddUserModal.vue';
+import EditUserModal from './Partials/EditUserModal.vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -13,9 +14,11 @@ defineProps({
     },
 });
 
+let selectedUser;
 const selectedUserId = ref(null);
 const showAddUserModal = ref(false);
 const showDeleteUserModal = ref(false);
+const showEditUserModal = ref(false);
 
 const openAddUserModal = function () {
     showAddUserModal.value = true;
@@ -32,6 +35,15 @@ const openDeletedUserModal = function (userId) {
 
 const closeDeletedUserModal = function () {
     showDeleteUserModal.value = false;
+};
+
+const openEditUserModal = function (user) {
+    selectedUser = user ?? null;
+    showEditUserModal.value = true;
+};
+
+const closeEditUserModal = function () {
+    showEditUserModal.value = false;
 };
 
 const showAllUsers = function () {
@@ -106,6 +118,9 @@ const showDeletedUsersOnly = function () {
                                     </td>
                                     <td class="flex gap-2 px-6 py-4">
                                         <a
+                                            @click.prevent="
+                                                openEditUserModal(user)
+                                            "
                                             href="#"
                                             class="font-medium text-blue-600 hover:underline dark:text-blue-500"
                                             :class="{
@@ -138,6 +153,11 @@ const showDeletedUsersOnly = function () {
             :show="showDeleteUserModal"
             :userId="selectedUserId"
             @close="closeDeletedUserModal"
+        />
+        <EditUserModal
+            :show="showEditUserModal"
+            :user="selectedUser"
+            @close="closeEditUserModal"
         />
         <AddUserModal :show="showAddUserModal" @close="closeAddUserModal" />
     </AuthenticatedLayout>
