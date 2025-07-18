@@ -1,9 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import DeleteUserModal from './Partials/DeleteUserModal.vue';
-import AddUserModal from './Partials/AddUserModal.vue';
-import EditUserModal from './Partials/EditUserModal.vue';
+import DeleteUserModal from './Modals/DeleteUserModal.vue';
+import AddUserModal from './Modals/AddUserModal.vue';
+import EditUserModal from './Modals/EditUserModal.vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -64,7 +64,7 @@ const showDeletedUsersOnly = function () {
 
     <AuthenticatedLayout>
         <div class="py-8">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-9xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div
                         class="border-b-2 border-gray-200 px-2 py-4 text-gray-900"

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Task;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+
 
 class UserSeeder extends Seeder
 {
@@ -14,6 +14,13 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // create a default admin user
+        User::factory()->create([
+            'name' => 'Zhi Yuan',
+            'email' => 'zhiyuan.lim@asj.com.sg',
+            'password' => Hash::make('Admin123.'),
+        ]);
+
         User::factory()
             ->count(20)
             ->create();
