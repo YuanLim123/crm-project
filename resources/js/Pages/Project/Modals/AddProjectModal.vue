@@ -26,6 +26,7 @@ const form = useForm({
     assignedUser: '',
     tasks: [],
 });
+
 </script>
 
 <template>

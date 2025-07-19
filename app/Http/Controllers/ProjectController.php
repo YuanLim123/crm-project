@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,7 +26,10 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Project/Create');
+        $clients = Client::doesntHave('project')->get();
+        return Inertia::render('Project/Create', [
+            'clients' => $clients,
+        ]);
     }
 
     /**
