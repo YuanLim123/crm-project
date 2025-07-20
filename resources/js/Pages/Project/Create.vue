@@ -60,13 +60,26 @@ const submit = function () {
         if (result.isConfirmed) {
             form.post(route('projects.store'), {
                 onSuccess: () => {
-                    if (page.props.errors)
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'A problem occurred while creating the project.',
-                            icon: 'error',
-                            confirmButtonText: 'OK',
-                        });
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Project created successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                    });
+                },
+                onError: (error) => {
+                    console.log(error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'A problem occurred while creating the project.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                    });
+                },
+                onFinish: () => {
+                    form.reset();
+                    selectedClient.value = '';
+                    selectedUser.value = '';
                 },
             });
         }

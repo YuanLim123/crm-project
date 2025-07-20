@@ -58,8 +58,6 @@ class ProjectController extends Controller
             'tasks.*.assignedUser' => ['required', 'exists:users,id'],
         ]);
 
-        dd($attributes);
-
         $project = Project::create([
             'title' => $attributes['title'],
             'description' => $attributes['description'],
@@ -81,7 +79,7 @@ class ProjectController extends Controller
             }
         }
 
-        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
+        return redirect()->route('projects.index');
     }
 
     /**

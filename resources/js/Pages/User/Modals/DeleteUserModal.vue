@@ -23,24 +23,24 @@ const emit = defineEmits(['close']);
 const deleteUser = function () {
     router.delete(route('users.destroy', props.userId), {
         onSuccess: () => {
-            emit('close');
-            if(page.props.flash.success) 
+            if (page.props.flash.success)
                 Swal.fire({
                     title: 'Success',
                     text: page.props.flash.success,
                     icon: 'success',
                     confirmButtonText: 'OK',
                 });
-            else if(page.props.flash.error)
-                Swal.fire({
-                    title: 'Error',
-                    text: page.props.flash.error,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                });
         },
         onError: (error) => {
-            console.log(error);
+            Swal.fire({
+                title: 'Error',
+                text: error,
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        },
+        onFinish: () => {
+            emit('close');
         },
     });
 };

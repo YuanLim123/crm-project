@@ -107,7 +107,7 @@ class UserController extends Controller
         
         // Ensure the user is not trying to delete themselves
         if ($user->id === auth()->user()->id) {
-            return redirect()->route('users.index')->with('error', 'You cannot delete your own account.');
+            return redirect()->back()->withErrors(['error' => 'You cannot delete your own account.']);
         }
 
         $user->delete();
