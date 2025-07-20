@@ -66,4 +66,9 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Task::class);
     }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
 }

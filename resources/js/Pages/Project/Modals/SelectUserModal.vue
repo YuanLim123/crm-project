@@ -8,7 +8,7 @@ const props = defineProps({
         default: false,
     },
 
-    clients: {
+    users: {
         type: Array,
         default: () => [],
     },
@@ -21,43 +21,37 @@ const emit = defineEmits(['close', 'select']);
     <Modal :show="props.show" @close="emit('close')">
         <div class="p-6">
             <h2 class="py-2 text-lg font-medium text-gray-900">
-                Select a client
+                Select a User
             </h2>
-            <div class="overflow-x-auto shadow-md">
+            <div class="overflow-x-auto overflow-y-auto shadow-md">
                 <table class="w-full text-left text-sm rtl:text-right">
                     <thead
                         class="border-b-2 border-gray-200 bg-gray-100 text-xs uppercase text-gray-500"
                     >
                         <tr>
-                            <th scope="col" class="px-6 py-3">Company</th>
-                            <th scope="col" class="px-6 py-3">
-                                Contact Person
-                            </th>
+                            <th scope="col" class="px-6 py-3">Name</th>
                             <th scope="col" class="px-6 py-3">Email</th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            v-for="client in clients"
-                            :key="client.id"
+                            v-for="user in users"
+                            :key="user.id"
                             class="border-b bg-white"
                         >
                             <th
                                 scope="row"
                                 class="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
                             >
-                                {{ client.company }}
+                                {{ user.name }}
                             </th>
                             <td class="px-6 py-4">
-                                {{ client.contact_person }}
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ client.email }}
+                                {{ user.email }}
                             </td>
                             <td class="px-6 py-4">
                                 <a
-                                    @click.prevent="emit('select', client)"
+                                    @click.prevent="emit('select', user)"
                                     href="#"
                                     class="font-medium text-blue-600 hover:underline dark:text-blue-500"
                                     >Select</a

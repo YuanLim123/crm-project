@@ -8,13 +8,22 @@ import TextInput from '@/Components/TextInput.vue';
 import TextAreaInput from '@/Components/TextAreaInput.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import ClientSection from './Partials/ClientSection.vue';
+import UserSection from './Partials/UserSection.vue';
 import SelectClientModal from './Modals/SelectClientModal.vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import SelectUserModal from './Modals/SelectUserModal.vue';
+import AddTaskModal from './Modals/AddTaskModal.vue';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Swal from 'sweetalert2';
+
+const page = usePage();
 
 const showSelectClientModal = ref(false);
+const showSelectUserModal = ref(false);
+const showAddTaskModal = ref(false);
 
 const selectedClient = ref(null);
+const selectedUser = ref(null);
 
 const form = useForm({
     title: '',
@@ -31,10 +40,37 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    users: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const submit = function () {
-    console.log(form);
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to create this project?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+    }).then((result) => {
+        form.tasks.forEach((task) => {
+            task.assignedUser = task.assignedUser ? task.assignedUser.id : ''; // store only the ID
+        });
+        if (result.isConfirmed) {
+            form.post(route('projects.store'), {
+                onSuccess: () => {
+                    if (page.props.errors)
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'A problem occurred while creating the project.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        });
+                },
+            });
+        }
+    });
 };
 
 const goBack = function () {
@@ -49,13 +85,51 @@ const closeSelectClientModal = function () {
     showSelectClientModal.value = false;
 };
 
+const openSelectUserModal = function () {
+    showSelectUserModal.value = true;
+};
+
+const closeSelectUserModal = function () {
+    showSelectUserModal.value = false;
+};
+
+const openAddTaskModal = function () {
+    showAddTaskModal.value = true;
+};
+
+const closeAddTaskModal = function () {
+    showAddTaskModal.value = false;
+};
+
 const selectClient = function (client) {
-    form.client = client.id;
+    form.client = client.id; // only store the ID and get the rest from the backend
     showSelectClientModal.value = false;
     selectedClient.value = client;
+};
 
-    console.log('Selected client:', selectedClient.value);
-    console.log('Form client:', form.client);
+const removeSelectedClient = function () {
+    selectedClient.value = null;
+    form.client = '';
+};
+
+const removeSelectedUser = function () {
+    selectedUser.value = null;
+    form.assignedUser = '';
+};
+
+const selectUser = function (user) {
+    form.assignedUser = user.id; // only store the ID and get the rest from the backend
+    showSelectUserModal.value = false;
+    selectedUser.value = user;
+};
+
+const addTask = function (task) {
+    form.tasks.push(task);
+    showAddTaskModal.value = false;
+};
+
+const removeTask = function (index) {
+    form.tasks.splice(index, 1);
 };
 
 const STATUS = [
@@ -155,17 +229,187 @@ const STATUS = [
                                     :message="form.errors.endDate"
                                 />
                             </div>
+                            <div class="mt-4 flex flex-row gap-16">
+                                <div class="w-1/3 grow">
+                                    <a
+                                        @click.prevent="openSelectClientModal"
+                                        href="#"
+                                        class="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                                        >Click here to select a client</a
+                                    >
+                                    <span class="pl-2">
+                                        <InputError
+                                            :message="form.errors.client"
+                                        />
+                                    </span>
+
+                                    <p class="text-gray-400">
+                                        {{
+                                            selectedClient
+                                                ? selectedClient.company
+                                                : 'No client selected'
+                                        }}
+                                        <button
+                                            v-if="selectedClient"
+                                            @click="removeSelectedClient"
+                                            type="button"
+                                            class="ml-2 text-red-500 hover:text-red-700"
+                                            title="Remove selected client"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-4 w-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </p>
+
+                                    <div v-if="selectedClient" class="mt-4">
+                                        <ClientSection
+                                            :client="selectedClient"
+                                            class="h-80"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="w-1/3 grow">
+                                    <a
+                                        @click.prevent="openSelectUserModal"
+                                        href="#"
+                                        class="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                                        >Click here to select a user</a
+                                    >
+                                    <span class="pl-2">
+                                        <InputError
+                                            :message="form.errors.assignedUser"
+                                        />
+                                    </span>
+                                    <p class="text-gray-400">
+                                        {{
+                                            selectedUser
+                                                ? selectedUser.name
+                                                : 'No user selected'
+                                        }}
+                                        <button
+                                            v-if="selectedUser"
+                                            @click="removeSelectedUser"
+                                            type="button"
+                                            class="ml-2 text-red-500 hover:text-red-700"
+                                            title="Remove selected user"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-4 w-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </p>
+
+                                    <div v-if="selectedUser" class="mt-4">
+                                        <UserSection
+                                            :user="selectedUser"
+                                            class="h-80"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="mt-4">
                                 <a
-                                    @click.prevent="openSelectClientModal"
+                                    @click.prevent="openAddTaskModal"
                                     href="#"
                                     class="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                                    >Choose a client</a
+                                    >Click here to add task</a
                                 >
-
-                                <div v-if="selectedClient" class="mt-4">
-                                    <ClientSection :client="selectedClient" class="flex-none"/>
+                                <div v-if="form.tasks.length > 0" class="mt-2">
+                                    <table
+                                        class="w-full text-left text-sm rtl:text-right"
+                                    >
+                                        <thead
+                                            class="bg-gray-50 text-xs uppercase text-gray-700"
+                                        >
+                                            <tr>
+                                                <th
+                                                    scope="col"
+                                                    class="px-6 py-3"
+                                                >
+                                                    Title
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-6 py-3"
+                                                >
+                                                    Description
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-6 py-3"
+                                                >
+                                                    Assigned User
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    class="px-6 py-3"
+                                                >
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                v-for="(
+                                                    task, index
+                                                ) in form.tasks"
+                                                :key="index"
+                                                class="border-b bg-white"
+                                            >
+                                                <th
+                                                    scope="row"
+                                                    class="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
+                                                >
+                                                    {{ task.title }}
+                                                </th>
+                                                <td class="px-6 py-4">
+                                                    {{ task.description }}
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    {{
+                                                        task.assignedUser
+                                                            ? task.assignedUser
+                                                                  .name
+                                                            : 'TBA'
+                                                    }}
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <a
+                                                        @click.prevent="
+                                                            removeTask(index)
+                                                        "
+                                                        class="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                                                        >Remove
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
@@ -188,6 +432,19 @@ const STATUS = [
             @close="closeSelectClientModal"
             :clients="props.clients"
             @select="selectClient"
+        />
+        <SelectUserModal
+            :show="showSelectUserModal"
+            @close="closeSelectUserModal"
+            :users="props.users"
+            @select="selectUser"
+        />
+        <AddTaskModal
+            :show="showAddTaskModal"
+            @close="closeAddTaskModal"
+            :users="props.users"
+            :status="STATUS"
+            @submit="addTask"
         />
     </AuthenticatedLayout>
 </template>

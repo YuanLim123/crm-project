@@ -15,6 +15,14 @@ class Client extends Model implements HasMedia
     /** @use HasFactory<\Database\Factories\ClientFactory> */
     use HasFactory, InteractsWithMedia, SoftDeletes;
 
+    protected $fillable = [
+        'company', 
+        'contact_person', 
+        'email', 
+        'phone',
+        'company_address'
+    ];
+
     public function project(): HasOne
     {
         return $this->hasOne(Project::class);

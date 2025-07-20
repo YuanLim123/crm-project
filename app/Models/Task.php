@@ -15,6 +15,15 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'title',
+        'description',
+        'end_date',
+        'user_id',
+        'project_id',
+        'status',
+    ];
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
