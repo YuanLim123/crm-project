@@ -32,7 +32,23 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'company' => 'required|string|max:255',
+            'contactPerson' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'companyAddress' => 'required|string|max:255',
+        ]);
+
+        Client::create([
+            'company' => $request->company,
+            'contact_person' => $request->contactPerson,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'company_address' => $request->companyAddress,
+        ]);
+
+        return redirect()->route('clients.index');
     }
 
     /**
