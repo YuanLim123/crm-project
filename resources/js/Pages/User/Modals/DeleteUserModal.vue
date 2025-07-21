@@ -34,7 +34,7 @@ const deleteUser = function () {
         onError: (error) => {
             Swal.fire({
                 title: 'Error',
-                text: error,
+                text: error.error,
                 icon: 'error',
                 confirmButtonText: 'OK',
             });
