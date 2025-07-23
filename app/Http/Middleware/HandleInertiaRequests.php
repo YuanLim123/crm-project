@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Spatie\Permission\Models\Permission;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,15 +30,25 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
+        $data =  [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'can' => $request->user()?->getPermissionsViaRoles()
+                    ->map(function (Permission $permission): array {
+                        return [
+                            $permission['name'] => auth()->user()->can($permission['name']),
+                        ];
+                    })
+                    ->collapse()
+                    ->all(),
             ],
             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
             ],
         ];
+
+        return $data;
     }
 }

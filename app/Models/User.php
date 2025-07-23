@@ -13,11 +13,13 @@ use App\Models\Task;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, InteractsWithMedia, SoftDeletes;
+    use HasFactory, Notifiable, InteractsWithMedia, SoftDeletes, HasRoles;
+
 
     /**
      * The attributes that are mass assignable.

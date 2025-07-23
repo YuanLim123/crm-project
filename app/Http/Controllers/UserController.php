@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use Inertia\Inertia;
 
@@ -18,10 +19,10 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = User::query()
-                ->when($request->showDeleted, function ($q) {
-                    $q->onlyTrashed();
-                })
-                ->get();
+            ->when($request->showDeleted, function ($q) {
+                $q->onlyTrashed();
+            })
+            ->get();
         return Inertia::render('User/Index', [
             'users' => $users,
         ]);
@@ -46,11 +47,11 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-        ]);
+        ])->assignRole('user');
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -103,8 +104,10 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        Gate::authorize('delete user');
         
+        $user = User::findOrFail($id);
+
         // Ensure the user is not trying to delete themselves
         if ($user->id === auth()->user()->id) {
             return redirect()->back()->withErrors(['error' => 'You cannot delete your own account.']);

@@ -21,6 +21,12 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Admin123.'),
         ]);
 
+        User::factory()->create([
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('Admin123.'),
+        ])->syncRoles('admin'); // we need to override the default user role
+
         User::factory()
             ->count(20)
             ->create();

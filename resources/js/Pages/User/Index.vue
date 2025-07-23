@@ -4,9 +4,8 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DeleteUserModal from './Modals/DeleteUserModal.vue';
 import AddUserModal from './Modals/AddUserModal.vue';
 import EditUserModal from './Modals/EditUserModal.vue';
-import { Head } from '@inertiajs/vue3';
-import { router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 defineProps({
     users: {
@@ -19,6 +18,10 @@ const selectedUserId = ref(null);
 const showAddUserModal = ref(false);
 const showDeleteUserModal = ref(false);
 const showEditUserModal = ref(false);
+
+const page = usePage()
+
+const can = computed(() => page.props.auth.can);
 
 const openAddUserModal = function () {
     showAddUserModal.value = true;
@@ -118,6 +121,7 @@ const showDeletedUsersOnly = function () {
                                     </td>
                                     <td class="flex gap-2 px-6 py-4">
                                         <a
+                                            v-if="can.edit_user"
                                             @click.prevent="
                                                 openEditUserModal(user)
                                             "
@@ -130,6 +134,7 @@ const showDeletedUsersOnly = function () {
                                             >Edit</a
                                         >
                                         <a
+                                            v-if="can.delete_user"
                                             @click.prevent="
                                                 openDeletedUserModal(user.id)
                                             "
