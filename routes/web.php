@@ -72,6 +72,7 @@ Route::controller(TestController::class)->prefix('test')->group(function () {
     Route::get('/', 'index')->name('test.index');
     Route::get('/add-media-to-library', 'addMediaToLibrary')->name('test.add-media-to-library');
     Route::get('/test-collection-apis', 'testCollectionApis')->name('test.collection-apis');
+    Route::get('/update-relations', 'updateRelations')->name('test.update-relations');
 });
 
 require __DIR__ . '/auth.php';

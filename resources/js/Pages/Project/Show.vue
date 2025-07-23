@@ -30,7 +30,7 @@ defineProps({
                             {{ project.title }}
                         </div>
                         <div class="flex flex-row justify-end items-center gap-4 mr-6">
-                            <Link :href="route('projects.index')"
+                            <Link :href="route('projects.edit', { project: project })"
                                 class="px-2  bg-blue-500 h-8 text-white rounded-lg hover:bg-blue-600 flex items-center">
                             Edit Project</Link>
                             <Link :href="route('projects.index')"
