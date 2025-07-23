@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Mail\ClientCreated;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,8 +68,10 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-
-Route::get('/test', [TestController::class, 'index']);
-Route::get('add-media-to-library', [TestController::class, 'addMediaToLibrary'])->name('add-media-to-library');
+Route::controller(TestController::class)->prefix('test')->group(function () {
+    Route::get('/', 'index')->name('test.index');
+    Route::get('/add-media-to-library', 'addMediaToLibrary')->name('test.add-media-to-library');
+    Route::get('/test-collection-apis', 'testCollectionApis')->name('test.collection-apis');
+});
 
 require __DIR__ . '/auth.php';

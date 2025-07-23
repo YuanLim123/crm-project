@@ -25,5 +25,16 @@ class TestController extends Controller
             ->toMediaCollection();
     }
 
+    public function testCollectionApis(Request $request)
+    {
+        $collection = collect([
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]);
 
+        $collapsed = $collection->collapse();
+
+        return $collapsed->all();
+    }
 }

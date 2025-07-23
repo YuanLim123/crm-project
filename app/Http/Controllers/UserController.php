@@ -53,7 +53,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ])->assignRole('user');
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -96,7 +96,7 @@ class UserController extends Controller
             'email' => $attributes['email'],
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -105,7 +105,7 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         Gate::authorize('delete user');
-        
+
         $user = User::findOrFail($id);
 
         // Ensure the user is not trying to delete themselves

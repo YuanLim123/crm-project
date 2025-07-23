@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClientCreated;
 use Inertia\Inertia;
+
 
 class ClientController extends Controller
 {
@@ -40,13 +43,15 @@ class ClientController extends Controller
             'companyAddress' => 'required|string|max:255',
         ]);
 
-        Client::create([
+        $client = Client::create([
             'company' => $request->company,
             'contact_person' => $request->contactPerson,
             'email' => $request->email,
             'phone' => $request->phone,
             'company_address' => $request->companyAddress,
         ]);
+
+        Mail::to($client)->send(new ClientCreated($client->company));
 
         return redirect()->route('clients.index');
     }
