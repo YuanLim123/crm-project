@@ -8,8 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
-
-
+use Carbon\Carbon;
 
 class ProjectController extends Controller
 {
@@ -48,14 +47,14 @@ class ProjectController extends Controller
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:128'],
             'description' => ['required', 'string'],
-            'status' => ['required', 'in:pending,in_progress,completed'],
+            'status' => ['required', 'in:pending,completed,cancelled'],
             'endDate' => ['required', 'date'],
             'client' => ['required', 'exists:clients,id'],
             'assignedUser' => ['required', 'exists:users,id'],
             'tasks' => ['array'],
             'tasks.*.title' => ['required', 'string', 'max:128'],
             'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', 'in:pending,in_progress,completed'],
+            'tasks.*.status' => ['required', 'in:pending,completed,cancelled'],
             'tasks.*.endDate' => ['required', 'date'],
             'tasks.*.assignedUser' => ['required', 'exists:users,id'],
         ]);
@@ -66,7 +65,7 @@ class ProjectController extends Controller
             'status' => $attributes['status'],
             'end_date' => $attributes['endDate'],
             'client_id' => $attributes['client'],
-            'user_id' => $attributes['assignedUser'],
+            'user_id' => $attributes['user'],
         ]);
 
         if (!empty($attributes['tasks'])) {
@@ -76,7 +75,7 @@ class ProjectController extends Controller
                     'description' => $task['description'],
                     'status' => $task['status'],
                     'end_date' => $task['endDate'],
-                    'user_id' => $task['assignedUser'],
+                    'user_id' => $task['user'],
                 ]);
             }
         }
@@ -100,21 +99,32 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
+
         $clients = Client::doesntHave('project')->get();
         $users = User::all();
 
-        $selectedClient = $project->client;
-        $selectedUser = $project->user;
-        $selectedTasks = $project->tasks;
+        $project->load(['client', 'user', 'tasks.user']);
+
+        $project->tasks->transform(function ($task) {
+            return [
+                'id' => $task->id,
+                'title' => $task->title,
+                'description' => $task->description,
+                'status' => $task->status,
+                // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
+                // to show it in the form
+                'endDate' => Carbon::createFromFormat('d/m/Y', $task->end_date)->format('Y-m-d'),
+                'user' => $task->user,
+            ];
+        });
 
         return Inertia::render('Project/Edit', [
             'clients' => $clients,
             'users' => $users,
             'project' => $project,
-            'selectedClient' => $selectedClient,
-            'selectedUser' => $selectedUser,
-            'selectedTasks' => $selectedTasks,
-            'endDate' => date('Y-m-d', strtotime($project->end_date)),
+            // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
+            // to show it in the form
+            'endDate' => Carbon::createFromFormat('d/m/Y', $project->end_date)->format('Y-m-d'),
         ]);
     }
 
@@ -123,21 +133,20 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        dd($request->all());
-        
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:128'],
             'description' => ['required', 'string'],
-            'status' => ['required', 'in:pending,in_progress,completed'],
+            'status' => ['required', 'in:pending,completed,cancelled'],
             'endDate' => ['required', 'date'],
             'client' => ['required', 'exists:clients,id'],
             'assignedUser' => ['required', 'exists:users,id'],
             'tasks' => ['array'],
+            'tasks.*.id' => ['nullable'],
             'tasks.*.title' => ['required', 'string', 'max:128'],
             'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', 'in:pending,in_progress,completed'],
+            'tasks.*.status' => ['required', 'in:pending,completed,cancelled'],
             'tasks.*.endDate' => ['required', 'date'],
-            'tasks.*.assignedUser' => ['required', 'exists:users,id'],
+            'tasks.*.user' => ['required', 'exists:users,id'],
         ]);
 
         $project->update([
@@ -149,19 +158,50 @@ class ProjectController extends Controller
             'user_id' => $attributes['assignedUser'],
         ]);
 
-        // Delete all old tasks
-        $project->tasks()->delete();
+        // initial approach, Delete all old tasks then Create new tasks
+        // $project->tasks()->delete();
+        // foreach ($attributes['tasks'] as $task) {
+        //     $project->tasks()->create([
+        //         'title' => $task['title'],
+        //         'description' => $task['description'],
+        //         'status' => $task['status'],
+        //         'end_date' => $task['endDate'],
+        //         'user_id' => $task['user'],
+        //     ]);
+        // }
 
+        // Sync tasks
+        $oldData = $project->tasks;
+        $newData = $attributes['tasks'] ?? [];
+
+        $partition = $this->updateRelations($oldData, $newData);
+        // Delete removed tasks
+        foreach ($partition['delete'] as $task) {
+            $project->tasks()->where('id', $task['id'])->delete();
+        }
+
+        // Update existing tasks
+        foreach ($partition['update'] as $task) {
+            $project->tasks()->where('id', $task['id'])->update([
+                'title' => $task['title'],
+                'description' => $task['description'],
+                'status' => $task['status'],
+                'end_date' => $task['endDate'],
+                'user_id' => $task['user'],
+            ]);
+        }
         // Create new tasks
-        foreach ($attributes['tasks'] as $task) {
+        foreach ($partition['create'] as $task) {
             $project->tasks()->create([
                 'title' => $task['title'],
                 'description' => $task['description'],
                 'status' => $task['status'],
                 'end_date' => $task['endDate'],
-                'user_id' => $task['assignedUser'],
+                'user_id' => $task['user'],
             ]);
         }
+
+        return redirect()->route('projects.show', $project->id);
     }
 
     /**
@@ -172,28 +212,27 @@ class ProjectController extends Controller
         //
     }
 
+    // https://laracasts.com/discuss/channels/eloquent/update-create-and-delete-hasmany-relations-in-one-go
     private function updateRelations($oldData, $newData)
     {
-        // ids
         $oldIds = Arr::pluck($oldData, 'id');
-        $newIds = array_filter(Arr::pluck($newData, 'id'), 'is_numeric');
+        $newIds = Arr::pluck($newData, 'id');
 
         // groups
         $delete = collect($oldData)
             ->filter(function ($model) use ($newIds) {
-                return !in_array($model->id, $newIds);
+                return !in_array($model["id"], $newIds);
             });
-
+        
         $update = collect($newData)
             ->filter(function ($model) use ($oldIds) {
-                return property_exists($model, 'id') && in_array($model->id, $oldIds);
+                return isset($model["id"]) && in_array($model["id"], $oldIds);
             });
 
         $create = collect($newData)
             ->filter(function ($model) {
-                return !property_exists($model, 'id');
+                return !isset($model["id"]);
             });
-
         // return
         return compact('delete', 'update', 'create');
     }

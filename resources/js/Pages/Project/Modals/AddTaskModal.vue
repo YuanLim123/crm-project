@@ -33,7 +33,7 @@ const form = useForm({
     description: '',
     status: '',
     endDate: '',
-    assignedUser: '',
+    user: '',
 });
 
 const nameWithEmail = function (user) {
@@ -117,7 +117,7 @@ const submit = function() {
                     <InputLabel for="user" value="User" />
                     <multiselect
                         id="single-select-search"
-                        v-model="form.assignedUser"
+                        v-model="form.user"
                         :options="users"
                         :custom-label="nameWithEmail"
                         placeholder="Select one"

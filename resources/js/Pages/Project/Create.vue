@@ -147,8 +147,9 @@ const removeTask = function (index) {
 
 const STATUS = [
     { value: 'pending', text: 'Pending' },
-    { value: 'in_progress', text: 'In Progress' },
     { value: 'completed', text: 'Completed' },
+    { value: 'cancelled', text: 'Cancelled' },
+
 ];
 </script>
 

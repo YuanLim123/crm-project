@@ -12,11 +12,10 @@ import UserSection from './Partials/UserSection.vue';
 import SelectClientModal from './Modals/SelectClientModal.vue';
 import SelectUserModal from './Modals/SelectUserModal.vue';
 import AddTaskModal from './Modals/AddTaskModal.vue';
-import { Head, useForm, router, usePage } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import Swal from 'sweetalert2';
 
-const page = usePage();
 
 const showSelectClientModal = ref(false);
 const showSelectUserModal = ref(false);
@@ -35,18 +34,6 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    selectedTasks: {
-        type: Array,
-        default: () => [],
-    },
-    selectedClient: {
-        type: Object,
-        default: null,
-    },
-    selectedUser: {
-        type: Object,
-        default: null,
-    },
     endDate: {
         type: String,
         default: '',
@@ -54,8 +41,8 @@ const props = defineProps({
 
 });
 
-const selectedClient = ref(props.selectedClient);
-const selectedUser = ref(props.selectedUser);
+const selectedClient = ref(props.project.client);
+const selectedUser = ref(props.project.user);
 
 const form = useForm({
     title: props.project.title,
@@ -64,10 +51,11 @@ const form = useForm({
     endDate: props.endDate,
     client: props.project.client_id,
     assignedUser: props.project.user_id,
-    tasks: props.selectedTasks,
+    tasks: props.project.tasks,
 });
 
 const submit = function () {
+    console.log(form.tasks)
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to update this project?',
@@ -76,7 +64,7 @@ const submit = function () {
         confirmButtonText: 'Yes',
     }).then((result) => {
         form.tasks.forEach((task) => {
-            task.assignedUser = task.assignedUser ? task.assignedUser.id : ''; // store only the ID
+            task.user = task.user ? task.user.id : ''; // store only the ID
         });
         if (result.isConfirmed) {
             form.put(route('projects.update', { project: props.project}), {
@@ -168,8 +156,8 @@ const removeTask = function (index) {
 
 const STATUS = [
     { value: 'pending', text: 'Pending' },
-    { value: 'in_progress', text: 'In Progress' },
     { value: 'completed', text: 'Completed' },
+    { value: 'cancelled', text: 'Cancelled' },
 ];
 </script>
 
@@ -426,8 +414,8 @@ const STATUS = [
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     {{
-                                                        task.assignedUser
-                                                            ? task.assignedUser
+                                                        task.user
+                                                            ? task.user
                                                                   .name
                                                             : 'TBA'
                                                     }}
