@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Client;
 use App\Models\Task;
 use App\Models\User;
+use App\Enums\ProjectStatus;
 
 class Project extends Model
 {
@@ -51,7 +52,14 @@ class Project extends Model
     protected function createdAt(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => date('d/m/Y', strtotime($value)),
+            get: fn($value) => date('d/m/Y', strtotime($value)),
         );
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => ProjectStatus::class,
+        ];
     }
 }

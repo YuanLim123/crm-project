@@ -38,7 +38,10 @@ const props = defineProps({
         type: String,
         default: '',
     },
-
+    status : {
+        type: Array,
+        default: () => [],
+    }
 });
 
 const selectedClient = ref(props.project.client);
@@ -221,7 +224,7 @@ const STATUS = [
                                     id="status"
                                     class="mt-1 block w-1/3"
                                     v-model="form.status"
-                                    :status="STATUS"
+                                    :status="props.status"
                                     required
                                 />
 
@@ -465,7 +468,7 @@ const STATUS = [
             :show="showAddTaskModal"
             @close="closeAddTaskModal"
             :users="props.users"
-            :status="STATUS"
+            :status="props.status"
             @submit="addTask"
         />
     </AuthenticatedLayout>

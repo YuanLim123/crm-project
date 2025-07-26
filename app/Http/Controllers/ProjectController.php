@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\ProjectStatus;
 
 class ProjectController extends Controller
 {
@@ -29,12 +31,22 @@ class ProjectController extends Controller
      */
     public function create()
     {
+        $status = [];
+        // Get status values from the ProjectStatus enum to show in the select input
+        foreach (ProjectStatus::cases() as $statusCase) {
+            $status[] = [
+                'value' => $statusCase->value,
+                'label' => ucfirst(str_replace('_', ' ', $statusCase->name)),
+            ];
+        }
+
         $clients = Client::doesntHave('project')->get();
         $users = User::all();
 
         return Inertia::render('Project/Create', [
             'clients' => $clients,
             'users' => $users,
+            'status' => $status,
         ]);
     }
 
@@ -43,20 +55,19 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:128'],
             'description' => ['required', 'string'],
-            'status' => ['required', 'in:pending,completed,cancelled'],
+            'status' => ['required', new Enum(ProjectStatus::class)],
             'endDate' => ['required', 'date'],
             'client' => ['required', 'exists:clients,id'],
             'assignedUser' => ['required', 'exists:users,id'],
             'tasks' => ['array'],
             'tasks.*.title' => ['required', 'string', 'max:128'],
             'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', 'in:pending,completed,cancelled'],
+            'tasks.*.status' => ['required', new Enum(ProjectStatus::class)],
             'tasks.*.endDate' => ['required', 'date'],
-            'tasks.*.assignedUser' => ['required', 'exists:users,id'],
+            'tasks.*.user' => ['required', 'exists:users,id'],
         ]);
 
         $project = Project::create([
@@ -65,7 +76,7 @@ class ProjectController extends Controller
             'status' => $attributes['status'],
             'end_date' => $attributes['endDate'],
             'client_id' => $attributes['client'],
-            'user_id' => $attributes['user'],
+            'user_id' => $attributes['assignedUser'],
         ]);
 
         if (!empty($attributes['tasks'])) {
@@ -99,6 +110,14 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
+        $status = [];
+        // Get status values from the ProjectStatus enum to show in the select input
+        foreach (ProjectStatus::cases() as $statusCase) {
+            $status[] = [
+                'value' => $statusCase->value,
+                'label' => ucfirst(str_replace('_', ' ', $statusCase->name)),
+            ];
+        }
 
         $clients = Client::doesntHave('project')->get();
         $users = User::all();
@@ -125,6 +144,7 @@ class ProjectController extends Controller
             // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
             // to show it in the form
             'endDate' => Carbon::createFromFormat('d/m/Y', $project->end_date)->format('Y-m-d'),
+            'status' => $status,
         ]);
     }
 
@@ -136,7 +156,7 @@ class ProjectController extends Controller
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:128'],
             'description' => ['required', 'string'],
-            'status' => ['required', 'in:pending,completed,cancelled'],
+            'status' => ['required', new Enum(ProjectStatus::class)],
             'endDate' => ['required', 'date'],
             'client' => ['required', 'exists:clients,id'],
             'assignedUser' => ['required', 'exists:users,id'],
@@ -144,7 +164,7 @@ class ProjectController extends Controller
             'tasks.*.id' => ['nullable'],
             'tasks.*.title' => ['required', 'string', 'max:128'],
             'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', 'in:pending,completed,cancelled'],
+            'tasks.*.status' => ['required', new Enum(ProjectStatus::class)],
             'tasks.*.endDate' => ['required', 'date'],
             'tasks.*.user' => ['required', 'exists:users,id'],
         ]);

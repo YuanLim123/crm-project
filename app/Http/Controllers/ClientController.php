@@ -51,7 +51,7 @@ class ClientController extends Controller
             'company_address' => $request->companyAddress,
         ]);
 
-        Mail::to($client)->send(new ClientCreated($client->company));
+        // Mail::to($client)->send(new ClientCreated($client->company));
 
         return redirect()->route('clients.index');
     }

@@ -44,6 +44,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    status: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const submit = function () {
@@ -55,7 +59,7 @@ const submit = function () {
         confirmButtonText: 'Yes',
     }).then((result) => {
         form.tasks.forEach((task) => {
-            task.assignedUser = task.assignedUser ? task.assignedUser.id : ''; // store only the ID
+            task.user = task.user ? task.user.id : ''; // store only the ID
         });
         if (result.isConfirmed) {
             form.post(route('projects.store'), {
@@ -145,12 +149,12 @@ const removeTask = function (index) {
     form.tasks.splice(index, 1);
 };
 
-const STATUS = [
-    { value: 'pending', text: 'Pending' },
-    { value: 'completed', text: 'Completed' },
-    { value: 'cancelled', text: 'Cancelled' },
+// const STATUS = [
+//     { value: 'pending', text: 'Pending' },
+//     { value: 'completed', text: 'Completed' },
+//     { value: 'cancelled', text: 'Cancelled' },
 
-];
+// ];
 </script>
 
 <template>
@@ -213,7 +217,7 @@ const STATUS = [
                                     id="status"
                                     class="mt-1 block w-1/3"
                                     v-model="form.status"
-                                    :status="STATUS"
+                                    :status="props.status"
                                     required
                                 />
 
@@ -457,7 +461,7 @@ const STATUS = [
             :show="showAddTaskModal"
             @close="closeAddTaskModal"
             :users="props.users"
-            :status="STATUS"
+            :status="props.status"
             @submit="addTask"
         />
     </AuthenticatedLayout>

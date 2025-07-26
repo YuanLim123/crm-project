@@ -22,7 +22,7 @@ const props = defineProps({
             :key="option.value"
             :value="option.value"
         >
-            {{ option.text }}
+            {{ option.label }}
         </option>
     </select>
 </template>
