@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -12,7 +13,11 @@ class TaskController extends Controller
      */
     public function index()
     {
+        $tasks = Task::with('project', 'user')
+            ->get();
+            
         return Inertia::render('Task/Index', [
+            'tasks' => $tasks,
         ]);
     }
 
