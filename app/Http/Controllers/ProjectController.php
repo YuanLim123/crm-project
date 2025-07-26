@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Validation\Rules\Enum;
 use App\Enums\ProjectStatus;
+use App\Http\Requests\ProjectPostRequest;
 
 class ProjectController extends Controller
 {
@@ -31,14 +32,6 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $status = [];
-        // Get status values from the ProjectStatus enum to show in the select input
-        foreach (ProjectStatus::cases() as $statusCase) {
-            $status[] = [
-                'value' => $statusCase->value,
-                'label' => ucfirst(str_replace('_', ' ', $statusCase->name)),
-            ];
-        }
 
         $clients = Client::doesntHave('project')->get();
         $users = User::all();
@@ -46,29 +39,16 @@ class ProjectController extends Controller
         return Inertia::render('Project/Create', [
             'clients' => $clients,
             'users' => $users,
-            'status' => $status,
+            'status' => ProjectStatus::toArray(),
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProjectPostRequest $request)
     {
-        $attributes = $request->validate([
-            'title' => ['required', 'string', 'max:128'],
-            'description' => ['required', 'string'],
-            'status' => ['required', new Enum(ProjectStatus::class)],
-            'endDate' => ['required', 'date'],
-            'client' => ['required', 'exists:clients,id'],
-            'assignedUser' => ['required', 'exists:users,id'],
-            'tasks' => ['array'],
-            'tasks.*.title' => ['required', 'string', 'max:128'],
-            'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', new Enum(ProjectStatus::class)],
-            'tasks.*.endDate' => ['required', 'date'],
-            'tasks.*.user' => ['required', 'exists:users,id'],
-        ]);
+        $attributes = $request->validated();
 
         $project = Project::create([
             'title' => $attributes['title'],
@@ -110,15 +90,6 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $status = [];
-        // Get status values from the ProjectStatus enum to show in the select input
-        foreach (ProjectStatus::cases() as $statusCase) {
-            $status[] = [
-                'value' => $statusCase->value,
-                'label' => ucfirst(str_replace('_', ' ', $statusCase->name)),
-            ];
-        }
-
         $clients = Client::doesntHave('project')->get();
         $users = User::all();
 
@@ -144,30 +115,17 @@ class ProjectController extends Controller
             // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
             // to show it in the form
             'endDate' => Carbon::createFromFormat('d/m/Y', $project->end_date)->format('Y-m-d'),
-            'status' => $status,
+            'status' => ProjectStatus::toArray(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Project $project)
+    public function update(ProjectPostRequest $request, Project $project)
     {
-        $attributes = $request->validate([
-            'title' => ['required', 'string', 'max:128'],
-            'description' => ['required', 'string'],
-            'status' => ['required', new Enum(ProjectStatus::class)],
-            'endDate' => ['required', 'date'],
-            'client' => ['required', 'exists:clients,id'],
-            'assignedUser' => ['required', 'exists:users,id'],
-            'tasks' => ['array'],
-            'tasks.*.id' => ['nullable'],
-            'tasks.*.title' => ['required', 'string', 'max:128'],
-            'tasks.*.description' => ['required', 'string', 'max:255'],
-            'tasks.*.status' => ['required', new Enum(ProjectStatus::class)],
-            'tasks.*.endDate' => ['required', 'date'],
-            'tasks.*.user' => ['required', 'exists:users,id'],
-        ]);
+        
+        $attributes = $request->validated();
 
         $project->update([
             'title' => $attributes['title'],
@@ -243,7 +201,7 @@ class ProjectController extends Controller
             ->filter(function ($model) use ($newIds) {
                 return !in_array($model["id"], $newIds);
             });
-        
+
         $update = collect($newData)
             ->filter(function ($model) use ($oldIds) {
                 return isset($model["id"]) && in_array($model["id"], $oldIds);

@@ -104,7 +104,7 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        Gate::authorize('delete user');
+        Gate::authorize('delete_user');
 
         $user = User::findOrFail($id);
 
