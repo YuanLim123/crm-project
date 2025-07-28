@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AddTaskModal from './Modals/AddTaskModal.vue';
+import EditTaskModal from './Modals/EditTaskModal.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -23,7 +24,10 @@ const props = defineProps({
     },
 });
 
+let selectedTask;
 const showAddTaskModal = ref(false);
+const showEditTaskModal = ref(false);
+
 
 const openAddTaskModal = function () {
     showAddTaskModal.value = true;
@@ -31,6 +35,16 @@ const openAddTaskModal = function () {
 const closeAddTaskModal = function () {
     showAddTaskModal.value = false;
 };
+
+const openEditTaskModal = function (task) {
+    selectedTask = task ?? null;
+    showEditTaskModal.value = true;
+};
+
+const closeEditTaskModal = function () {
+    showEditTaskModal.value = false;
+};
+
 </script>
 
 <template>
@@ -88,11 +102,17 @@ const closeAddTaskModal = function () {
                                     <td class="px-6 py-4">
                                         {{ task.user ? task.user.name : 'TBA' }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="flex gap-2 px-6 py-4">
                                         <a
                                             href="#"
                                             class="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                                            >View</a
+                                            @click.prevent="openEditTaskModal(task)"
+                                            >Edit</a
+                                        >
+                                        <a
+                                            href="#"
+                                            class="font-medium text-red-600 hover:underline dark:text-red-500"
+                                            >Delete</a
                                         >
                                     </td>
                                 </tr>
@@ -105,6 +125,14 @@ const closeAddTaskModal = function () {
         <AddTaskModal
             :show="showAddTaskModal"
             @close="closeAddTaskModal"
+            :users="props.users"
+            :projects="props.projects"
+            :status="props.status"
+        />
+        <EditTaskModal
+            :show="showEditTaskModal"
+            @close="closeEditTaskModal"
+            :task="selectedTask"
             :users="props.users"
             :projects="props.projects"
             :status="props.status"

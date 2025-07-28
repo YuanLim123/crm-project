@@ -16,6 +16,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    task: {
+        type: Object,
+        default: null,
+    },
     users: {
         type: Array,
         default: () => [],

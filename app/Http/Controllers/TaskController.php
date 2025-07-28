@@ -60,10 +60,8 @@ class TaskController extends Controller
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'user' => ['required', 'array'],
-            'user.id' => ['exists:users,id'],
-            'project' => ['required', 'array'],
-            'project.id' => ['exists:projects,id'],
+            'user' => ['required', 'exists:users,id'],
+            'project' => ['required','exists:projects,id'],
             'status' => ['required', new Enum(ProjectStatus::class)],
             'endDate' => ['required', 'date'],
         ]);
@@ -73,8 +71,8 @@ class TaskController extends Controller
             'description' => $attributes['description'],
             'status' => $attributes['status'],
             'end_date' => $attributes['endDate'],
-            'user_id' => $attributes['user']['id'],
-            'project_id' => $attributes['project']['id'],
+            'user_id' => $attributes['user'],
+            'project_id' => $attributes['project'],
         ]);
 
         return redirect()->route('tasks.index');
