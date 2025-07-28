@@ -2,7 +2,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, Head, router } from '@inertiajs/vue3';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import AddProjectModal from './Modals/AddProjectModal.vue';
 import { ref } from 'vue';
 
 defineProps({
@@ -10,15 +9,6 @@ defineProps({
         type: Array,
     },
 });
-
-const showAddProjectModal = ref(false);
-
-const openAddProjectModal = function () {
-    showAddProjectModal.value = true;
-};
-const closeAddProjectModal = function () {
-    showAddProjectModal.value = false;
-};
 
 const goToCreateProject = function () {
     router.get(route('projects.create'));
@@ -109,9 +99,5 @@ const goToCreateProject = function () {
                 </div>
             </div>
         </div>
-        <AddProjectModal
-            :show="showAddProjectModal"
-            @close="closeAddProjectModal"
-        />
     </AuthenticatedLayout>
 </template>

@@ -1,13 +1,36 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import AddTaskModal from './Modals/AddTaskModal.vue';
 import { Head } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     tasks: {
         type: Array,
     },
+    users: {
+        type: Array,
+        default: () => [],
+    },
+    projects: {
+        type: Array,
+        default: () => [],
+    },
+    status: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+const showAddTaskModal = ref(false);
+
+const openAddTaskModal = function () {
+    showAddTaskModal.value = true;
+};
+const closeAddTaskModal = function () {
+    showAddTaskModal.value = false;
+};
 </script>
 
 <template>
@@ -23,7 +46,9 @@ defineProps({
                         Tasks
                     </div>
                     <div class="flex flex-col gap-2 px-2 py-4">
-                        <PrimaryButton class="w-40">Add Task</PrimaryButton>
+                        <PrimaryButton class="w-40" @click="openAddTaskModal"
+                            >Add Task</PrimaryButton
+                        >
                     </div>
                     <div
                         class="relative overflow-x-auto shadow-md sm:rounded-lg"
@@ -37,7 +62,9 @@ defineProps({
                                     <th scope="col" class="px-6 py-3">
                                         Under Project
                                     </th>
-                                    <th scope="col" class="px-6 py-3">Assigned User</th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Assigned User
+                                    </th>
                                     <th scope="col" class="px-6 py-3">
                                         Action
                                     </th>
@@ -45,7 +72,7 @@ defineProps({
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="task in tasks"
+                                    v-for="task in props.tasks"
                                     :key="task.id"
                                     class="border-b bg-white"
                                 >
@@ -59,11 +86,7 @@ defineProps({
                                         {{ task.project.title }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{
-                                            task.user
-                                                ? task.user.name
-                                                : 'TBA'
-                                        }}
+                                        {{ task.user ? task.user.name : 'TBA' }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <a
@@ -79,5 +102,12 @@ defineProps({
                 </div>
             </div>
         </div>
+        <AddTaskModal
+            :show="showAddTaskModal"
+            @close="closeAddTaskModal"
+            :users="props.users"
+            :projects="props.projects"
+            :status="props.status"
+        />
     </AuthenticatedLayout>
 </template>
