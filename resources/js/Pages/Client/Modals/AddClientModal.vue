@@ -28,6 +28,8 @@ const form = useForm({
 const submit = function () {
     form.post(route('clients.store'), {
         onSuccess: () => {
+            // call form.reset before closing the modal to ensure the form is cleared
+            form.reset();
             emit('close');
             Swal.fire({
                 title: 'Success',
@@ -35,9 +37,6 @@ const submit = function () {
                 icon: 'success',
                 confirmButtonText: 'OK',
             });
-        },
-        onFinish: () => {
-            form.reset();
         },
     });
 };

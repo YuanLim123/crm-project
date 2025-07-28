@@ -8,7 +8,7 @@ import TextInput from '@/Components/TextInput.vue';
 import TextAreaInput from '@/Components/TextAreaInput.vue';
 import SelectInput from '@/Components/SelectInput.vue';
 import Swal from 'sweetalert2';
-import { useForm, router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import Multiselect from 'vue-multiselect';
 
 const props = defineProps({
@@ -37,8 +37,8 @@ const form = useForm({
     description: '',
     status: '',
     endDate: '',
-    user: null,
-    project: null,
+    user: '',
+    project: '',
 });
 
 const nameWithEmail = function (user) {
@@ -49,9 +49,11 @@ const projectTitle = function (project) {
     return project.title;
 };
 
-const submit = function (e) {
+const submit = function () {
     form.post(route('tasks.store'), {
         onSuccess: () => {
+            // call form.reset before closing the modal to ensure the form is cleared
+            form.reset();
             emit('close');
             Swal.fire({
                 title: 'Success',
@@ -59,14 +61,6 @@ const submit = function (e) {
                 icon: 'success',
                 confirmButtonText: 'OK',
             });
-        },
-        onFinish: () => {
-            form.title = '';
-            form.description = '';
-            form.status = '';
-            form.endDate = '';
-            form.user = null;
-            form.project = null;
         },
     });
 };
@@ -177,7 +171,14 @@ const submit = function (e) {
                         Cancel
                     </SecondaryButton>
 
-                    <PrimaryButton class="ms-4"> Add </PrimaryButton>
+                    <PrimaryButton
+                        class="ms-4"
+                        :class="{ 'opacity-25': form.processing }"
+                        :disabled="form.processing"
+                        type="submit"
+                    >
+                        Add
+                    </PrimaryButton>
                 </div>
             </form>
         </div>
