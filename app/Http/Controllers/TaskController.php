@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Project;
 use App\Enums\ProjectStatus;
 use Illuminate\Validation\Rules\Enum;
+use Carbon\Carbon;
 
 
 class TaskController extends Controller
@@ -20,6 +21,7 @@ class TaskController extends Controller
     {
         $tasks = Task::with('project', 'user')
             ->get();
+
 
         $users = User::all()->map(function ($user) {
             return [
@@ -61,7 +63,7 @@ class TaskController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'user' => ['required', 'exists:users,id'],
-            'project' => ['required','exists:projects,id'],
+            'project' => ['required', 'exists:projects,id'],
             'status' => ['required', new Enum(ProjectStatus::class)],
             'endDate' => ['required', 'date'],
         ]);
@@ -97,9 +99,9 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task)
     {
-        //
+        dd($request->all(), $task);
     }
 
     /**
