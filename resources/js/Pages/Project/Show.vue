@@ -6,12 +6,17 @@ import UserSection from './Partials/UserSection.vue';
 import TaskSection from './Partials/TaskSection.vue';
 import AddressSection from './Partials/AddressSection.vue';
 import ProjectTasksSection from './Partials/ProjectTasksSection.vue';
+import AttachmentSection from './Partials/AttachmentSection.vue';
 import { Head } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 
 defineProps({
     project: {
         type: Object,
+    },
+    files: {
+        type: Array,
+        default: () => [],
     }
 });
 
@@ -45,6 +50,7 @@ defineProps({
                         <TaskSection :tasks="project.tasks" />
                         <AddressSection :address="project.client.company_address" />
                         <ProjectTasksSection :tasks="project.tasks" />
+                        <AttachmentSection :files="files" />
                     </div>
                 </div>
             </div>

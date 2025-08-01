@@ -12,11 +12,13 @@ use App\Models\Client;
 use App\Models\Task;
 use App\Models\User;
 use App\Enums\ProjectStatus;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Project extends Model
+class Project extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'user_id',

@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\Project;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class TestController extends Controller
 {
@@ -73,5 +76,21 @@ class TestController extends Controller
 
         // return
         return compact('delete', 'update', 'create');
+    }
+
+    public function testRetrieveMedia(Request $request) 
+    {
+        // $project = Project::latest()->first(); 
+
+        // $mediaItem = $project->getFirstMedia('attachments');
+        
+        // return response()->download($mediaItem->getPath(), $mediaItem->file_name);
+
+        $media = Media::findOrFail(3);
+
+        return response()->download($media->getPath(), $media->file_name);
+
+
+
     }
 }

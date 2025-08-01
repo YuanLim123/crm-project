@@ -33,6 +33,7 @@ const form = useForm({
     client: '',
     assignedUser: '',
     tasks: [],
+    attachments: [],
 });
 
 const props = defineProps({
@@ -72,7 +73,15 @@ const submit = function () {
                     });
                 },
                 onError: (error) => {
-                    console.log(error);
+                    if (Object.keys(error).some(key => key.startsWith('attachments.'))) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Please ensure all files are valid.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        });
+                        return;
+                    }
                     Swal.fire({
                         title: 'Error',
                         text: 'A problem occurred while creating the project.',
@@ -149,12 +158,16 @@ const removeTask = function (index) {
     form.tasks.splice(index, 1);
 };
 
-// const STATUS = [
-//     { value: 'pending', text: 'Pending' },
-//     { value: 'completed', text: 'Completed' },
-//     { value: 'cancelled', text: 'Cancelled' },
+const handleFiles = function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    form.attachments.push(file);
+};
 
-// ];
+const removeFile = function (index) {
+    form.attachments.splice(index, 1);
+};
+
 </script>
 
 <template>
@@ -429,6 +442,65 @@ const removeTask = function (index) {
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    for="attachments"
+                                    value="Choose files to upload"
+                                    class="mt-4 w-40 cursor-pointer rounded-lg bg-blue-500 p-2 text-center text-white"
+                                />
+
+                                <input
+                                    id="attachments"
+                                    type="file"
+                                    class="hidden"
+                                    @change="handleFiles"
+                                />
+
+                                <table class="mt-2 table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="w-64 text-left"
+                                            >
+                                                File
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="w-64 text-left"
+                                            >
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="(
+                                                file, index
+                                            ) in form.attachments"
+                                            :key="index"
+                                        >
+                                            <td>
+                                                {{ file.name }}
+                                            </td>
+                                            <td>
+                                                <a
+                                                    @click.prevent="
+                                                        removeFile(index)
+                                                    "
+                                                    class="font-medium text-red-500 hover:underline cursor-pointer"
+                                                    >Remove
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <InputError v-if="form.errors.attachments"
+                                    class="mt-2"
+                                    :message="form.errors.attachments[0]"
+                                />
                             </div>
 
                             <div class="mt-4 flex items-center justify-end">

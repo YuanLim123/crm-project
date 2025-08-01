@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Carbon\Carbon;
-use Illuminate\Validation\Rules\Enum;
 use App\Enums\ProjectStatus;
 use App\Http\Requests\ProjectPostRequest;
+use Illuminate\Support\Facades\DB;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProjectController extends Controller
 {
@@ -71,6 +71,12 @@ class ProjectController extends Controller
             }
         }
 
+        if (!empty($attributes['attachments'])) {
+            foreach ($attributes['attachments'] as $attachment) {
+                $project->addMedia($attachment)->toMediaCollection('attachments');
+            }
+        }
+
         return redirect()->route('projects.index');
     }
 
@@ -80,8 +86,19 @@ class ProjectController extends Controller
     public function show(string $id)
     {
         $project = Project::with(['client', 'user', 'tasks', 'tasks.user'])->findOrFail($id);
+
+        $files = $project
+            ->getMedia('attachments')
+            ->map(function ($file) {
+                return [
+                    'id' => $file->id,
+                    'name' => $file->file_name,
+                ];
+            });
+
         return Inertia::render('Project/Show', [
             'project' => $project,
+            'files' => $files,
         ]);
     }
 
@@ -124,7 +141,7 @@ class ProjectController extends Controller
      */
     public function update(ProjectPostRequest $request, Project $project)
     {
-        
+
         $attributes = $request->validated();
 
         $project->update([
@@ -189,6 +206,14 @@ class ProjectController extends Controller
     {
         //
     }
+
+    public function downloadFile(string $id)
+    {
+        $media = Media::findOrFail($id);
+
+        return response()->download($media->getPath(), $media->file_name);
+    }
+
 
     // https://laracasts.com/discuss/channels/eloquent/update-create-and-delete-hasmany-relations-in-one-go
     private function updateRelations($oldData, $newData)

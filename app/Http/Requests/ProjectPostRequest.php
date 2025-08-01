@@ -37,6 +37,8 @@ class ProjectPostRequest extends FormRequest
             'tasks.*.status' => ['required', new Enum(ProjectStatus::class)],
             'tasks.*.endDate' => ['required', 'date'],
             'tasks.*.user' => ['required', 'exists:users,id'],
+            'attachments' => ['array'],
+            'attachments.*' => ['file', 'max:1024', 'mimes:jpg'], 
         ];
     }
 }

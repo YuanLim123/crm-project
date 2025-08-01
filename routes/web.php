@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/projects/{project}/edit', 'edit')->name('projects.edit');
         Route::put('/projects/{project}', 'update')->name('projects.update');
         Route::delete('/projects/{project}', 'destroy')->name('projects.destroy');
+        Route::get('/projects/download-file/{id}', 'downloadFile')->name('files.download');
     });
 
     Route::controller(TaskController::class)->group(function () {
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
 Route::controller(TestController::class)->prefix('test')->group(function () {
     Route::get('/', 'index')->name('test.index');
     Route::get('/add-media-to-library', 'addMediaToLibrary')->name('test.add-media-to-library');
+    Route::get('/test-retrieve-media', 'testRetrieveMedia')->name('test.retrieve-media');
     Route::get('/test-collection-apis', 'testCollectionApis')->name('test.collection-apis');
     Route::get('/update-relations', 'updateRelations')->name('test.update-relations');
 });
