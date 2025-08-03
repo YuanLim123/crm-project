@@ -4,7 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DeleteUserModal from './Modals/DeleteUserModal.vue';
 import AddUserModal from './Modals/AddUserModal.vue';
 import EditUserModal from './Modals/EditUserModal.vue';
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage,  } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 defineProps({

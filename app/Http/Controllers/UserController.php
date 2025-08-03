@@ -22,7 +22,16 @@ class UserController extends Controller
             ->when($request->showDeleted, function ($q) {
                 $q->onlyTrashed();
             })
-            ->get();
+            ->paginate(15)
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'deleted_at' => $user->deleted_at ? $user->deleted_at : null,
+                ];
+            });
+
         return Inertia::render('User/Index', [
             'users' => $users,
         ]);
