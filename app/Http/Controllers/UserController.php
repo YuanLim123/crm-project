@@ -85,6 +85,10 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (auth()->user()->cannot('edit_user')) {
+            abort(403);
+        }
+
         $attributes = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -112,7 +116,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        Gate::authorize('delete_user');
+        if (auth()->user()->cannot('delete_user')) {
+            abort(403);
+        }
 
         $user = User::findOrFail($id);
 

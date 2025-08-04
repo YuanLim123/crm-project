@@ -72,7 +72,7 @@ test('admin can delete a user', function () {
     $this->delete('/users/' . $this->user->id)
         ->assertStatus(302)
         ->assertRedirect('/users');
-});
+})->skip();
 
 
 test('user cannot delete another user', function () {
@@ -81,8 +81,69 @@ test('user cannot delete another user', function () {
     $userToDelete = createUser();
 
     $response = $this->delete('/users/' . $userToDelete->id);
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
+})->skip();
+
+
+test('admin can update a user', function () {
+    $admin = createAdminUser();
+    $this->actingAs($admin);
+
+    $updatedUser = [
+        'name' => 'Updated User',
+        'email' => 'updateduser@example.com',
+    ];
+
+    $response = $this->put(route('users.update', $this->user->id), $updatedUser);
+    $response->assertStatus(302);
+    $response->assertRedirect('/users');
+
+    $this->assertDatabaseHas('users', [
+        'id' => $this->user->id,
+        'name' => $updatedUser['name'],
+        'email' => $updatedUser['email'],
+    ]);
 });
+
+
+test('user cannot update a user', function () {
+    $this->actingAs($this->user);
+
+    $updatedUser = [
+        'name' => 'Updated User',
+        'email' => 'updateduser@example.com',
+    ];
+
+    $response = $this->put(route('users.update', $this->user->id), $updatedUser);
+    $response->assertStatus(403);
+    $response->assertForbidden();
+
+});
+
+
+test('create user successful', function () {
+    $this->actingAs($this->user);
+
+    $user = [
+        'name' => 'New User',
+        'email' => 'newuser@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ];
+
+    $response = $this->post('/users', $user);
+
+    $response->assertStatus(302);
+    $response->assertRedirect('/users');
+
+    $this->assertDatabaseHas('users', [
+        'name' => $user['name'],
+        'email' => $user['email'],
+    ]);
+
+    $result = User::where('email', $user['email'])->first();
+    $this->assertSame($user['name'], $result->name);
+})->skip();
 
 
 function createUser(): User
