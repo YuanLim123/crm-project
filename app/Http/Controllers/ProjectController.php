@@ -20,7 +20,16 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('client')->get();
+        $projects = Project::with('client')
+            ->paginate(10)
+            ->through(function ($project) {
+                return [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                    'client' => $project->client,
+                    'end_date' => $project->end_date,
+                ];
+            });
 
         return Inertia::render('Project/Index', [
             'projects' => $projects,

@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Pagination from '@/Components/Pagination.vue';
 import AddTaskModal from './Modals/AddTaskModal.vue';
 import EditTaskModal from './Modals/EditTaskModal.vue';
 import { Head } from '@inertiajs/vue3';
@@ -8,7 +9,7 @@ import { ref } from 'vue';
 
 const props = defineProps({
     tasks: {
-        type: Array,
+        type: Object,
     },
     users: {
         type: Array,
@@ -86,7 +87,7 @@ const closeEditTaskModal = function () {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="task in props.tasks"
+                                    v-for="task in props.tasks.data"
                                     :key="task.id"
                                     class="border-b bg-white"
                                 >
@@ -118,6 +119,7 @@ const closeEditTaskModal = function () {
                                 </tr>
                             </tbody>
                         </table>
+                        <Pagination :links="tasks.links"/>
                     </div>
                 </div>
             </div>

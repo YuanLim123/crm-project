@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Pagination from '@/Components/Pagination.vue';
 import DeleteUserModal from './Modals/DeleteUserModal.vue';
 import AddUserModal from './Modals/AddUserModal.vue';
 import EditUserModal from './Modals/EditUserModal.vue';
@@ -9,7 +10,7 @@ import { ref, computed } from 'vue';
 
 defineProps({
     users: {
-        type: Array,
+        type: Object,
     },
 });
 
@@ -106,7 +107,7 @@ const showDeletedUsersOnly = function () {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="user in users"
+                                    v-for="user in users.data"
                                     :key="user.id"
                                     class="border-b bg-white"
                                 >
@@ -150,6 +151,7 @@ const showDeletedUsersOnly = function () {
                                 </tr>
                             </tbody>
                         </table>
+                        <Pagination :links="users.links"/>
                     </div>
                 </div>
             </div>

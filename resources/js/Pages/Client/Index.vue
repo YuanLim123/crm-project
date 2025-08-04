@@ -1,13 +1,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Pagination from '@/Components/Pagination.vue';
 import AddClientModal from './Modals/AddClientModal.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 defineProps({
     clients: {
-        type: Array,
+        type: Object,
     },
 });
 
@@ -58,7 +59,7 @@ const closeAddClientModal = function () {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="client in clients"
+                                    v-for="client in clients.data"
                                     :key="client.id"
                                     class="border-b bg-white"
                                 >
@@ -88,6 +89,7 @@ const closeAddClientModal = function () {
                                 </tr>
                             </tbody>
                         </table>
+                        <Pagination :links="clients.links"/>
                     </div>
                 </div>
             </div>

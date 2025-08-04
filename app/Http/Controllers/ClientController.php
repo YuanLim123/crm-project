@@ -16,7 +16,20 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = Client::with('project')->get();
+        $clients = Client::with('project')
+            ->paginate(10)
+            ->through(function ($client) {
+                return [
+                    'id' => $client->id,
+                    'company' => $client->company,
+                    'contact_person' => $client->contact_person,
+                    'email' => $client->email,
+                    'phone' => $client->phone,
+                    'company_address' => $client->company_address,
+                    'project' => $client->project
+                ];
+            });
+
         return Inertia::render('Client/Index', [
             'clients' => $clients,
         ]);

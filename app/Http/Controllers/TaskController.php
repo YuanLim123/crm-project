@@ -20,7 +20,18 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::with('project', 'user')
-            ->get();
+            ->paginate(10)
+            ->through(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'description' => $task->description,
+                    'project' => $task->project,
+                    'user' => $task->user,
+                    'status' => $task->status,
+                    'end_date' => $task->end_date,
+                ];
+            });
 
 
         $users = User::all()->map(function ($user) {

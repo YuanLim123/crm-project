@@ -2,11 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, Head, router } from '@inertiajs/vue3';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { ref } from 'vue';
+import Pagination from '@/Components/Pagination.vue';
 
 defineProps({
     projects: {
-        type: Array,
+        type: Object,
     },
 });
 
@@ -56,7 +56,7 @@ const goToCreateProject = function () {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="project in projects"
+                                    v-for="project in projects.data"
                                     :key="project.id"
                                     class="border-b bg-white"
                                 >
@@ -95,6 +95,7 @@ const goToCreateProject = function () {
                                 </tr>
                             </tbody>
                         </table>
+                        <Pagination :links="projects.links"/>
                     </div>
                 </div>
             </div>
