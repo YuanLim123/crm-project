@@ -1,5 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\Client;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -44,4 +52,54 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function createUser(): User
+{
+    Role::firstOrCreate(['name' => 'user']);
+    return User::factory()->create();
+}
+
+
+function createUsers($count = 1)
+{
+    Role::firstOrCreate(['name' => 'user']);
+    return User::factory($count)->create();
+}
+
+function createAdminUser(): User
+{
+    Permission::firstOrCreate(['name' => 'edit_user']);
+    Permission::firstOrCreate(['name' => 'delete_user']);
+
+    $adminRole = Role::firstOrCreate(['name' => 'admin']);
+    $adminRole->givePermissionTo(['edit_user', 'delete_user']);
+
+    $admin = User::factory()->create([
+        'name' => 'admin',
+        'email' => 'admin@admin.com',
+        'password' => Hash::make('Admin123.'),
+    ]);
+
+    $admin->syncRoles('admin'); // we need to override the default user role
+
+    return $admin;
+}
+
+function createProject()
+{
+    $client = createClient();
+
+    $project =  Project::factory()
+        ->has(Task::factory()->count(3))
+        ->create([
+            'client_id' => $client->id,
+        ]);
+    return $project;
+}
+
+
+function createClient()
+{
+    return Client::factory()->create();
 }
