@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects', 'store')->name('projects.store');
         Route::get('/projects/{project}', 'show')->name('projects.show');
         Route::get('/projects/{project}/edit', 'edit')->name('projects.edit');
-        Route::post('/projects/{project}', 'update')->name('projects.update');
+        Route::post('/projects/{project}', 'update')->name('projects.update'); // method spoofing for Put https://inertiajs.com/file-uploads
         Route::delete('/projects/{project}', 'destroy')->name('projects.destroy');
         Route::get('/projects/download-file/{id}', 'downloadFile')->name('files.download');
     });
