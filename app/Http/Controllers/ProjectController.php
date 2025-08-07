@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Enums\ProjectStatus;
 use App\Http\Requests\ProjectPostRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProjectController extends Controller
@@ -134,6 +135,15 @@ class ProjectController extends Controller
             ];
         });
 
+        // retrive media files
+        $attachments = $project->getMedia('attachments')
+            ->map(function ($file) {
+                return [
+                    'id' => $file->id,
+                    'name' => $file->file_name,
+                ];
+            });
+
         return Inertia::render('Project/Edit', [
             'clients' => $clients,
             'users' => $users,
@@ -142,6 +152,7 @@ class ProjectController extends Controller
             // to show it in the form
             'endDate' => Carbon::createFromFormat('d/m/Y', $project->end_date)->format('Y-m-d'),
             'status' => ProjectStatus::toArray(),
+            'attachments' => $attachments,
         ]);
     }
 
@@ -150,7 +161,6 @@ class ProjectController extends Controller
      */
     public function update(ProjectPostRequest $request, Project $project)
     {
-
         $attributes = $request->validated();
 
         $project->update([
@@ -203,6 +213,23 @@ class ProjectController extends Controller
                 'end_date' => $task['endDate'],
                 'user_id' => $task['user'],
             ]);
+        }
+
+        // Handle current file deletions
+        if (!empty($attributes['fileToDelete'])) {
+            foreach ($attributes['fileToDelete'] as $fileId) {
+                $media = $project->getMedia('attachments')->where('id', $fileId)->first();
+                if ($media) {
+                    $media->delete();
+                }
+            }
+        }
+
+        // Handle new file uploads
+        if (!empty($attributes['attachments'])) {
+            foreach ($attributes['attachments'] as $attachment) {
+                $project->addMedia($attachment)->toMediaCollection('attachments');
+            }
         }
 
         return redirect()->route('projects.show', $project->id);

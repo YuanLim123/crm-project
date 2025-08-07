@@ -89,8 +89,17 @@ class TestController extends Controller
         $media = Media::findOrFail(3);
 
         return response()->download($media->getPath(), $media->file_name);
-
-
-
     }
+
+    public function deleteMedia(Request $request)
+    {
+        $project = Project::latest()->first();
+
+        $medias = $project->getMedia('attachments');
+
+        $medias[0]->delete();
+
+        return response()->json(['message' => 'Media deleted successfully']);
+    }
+
 }

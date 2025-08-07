@@ -38,7 +38,8 @@ class ProjectPostRequest extends FormRequest
             'tasks.*.endDate' => ['required', 'date'],
             'tasks.*.user' => ['required', 'exists:users,id'],
             'attachments' => ['array'],
-            'attachments.*' => ['file', 'max:1024', 'mimes:jpg'], 
+            // 'attachments.*' => ['file', 'max:1024', 'mimes:jpg'], 
+            'fileToDelete' => ['nullable'],
         ];
     }
 }

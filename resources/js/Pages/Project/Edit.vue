@@ -16,7 +16,6 @@ import { Head, useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import Swal from 'sweetalert2';
 
-
 const showSelectClientModal = ref(false);
 const showSelectUserModal = ref(false);
 const showAddTaskModal = ref(false);
@@ -38,10 +37,14 @@ const props = defineProps({
         type: String,
         default: '',
     },
-    status : {
+    status: {
         type: Array,
         default: () => [],
-    }
+    },
+    attachments: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const selectedClient = ref(props.project.client);
@@ -55,10 +58,38 @@ const form = useForm({
     client: props.project.client_id,
     assignedUser: props.project.user_id,
     tasks: props.project.tasks,
+    attachments: props.attachments,
+    fileToDelete: [],
 });
 
+const handleFiles = function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    form.attachments.push(file);
+};
+
+const removeFile = function (index) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this file?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const file = form.attachments[index];
+            if (file.id) {
+                // if the file has an ID, it means it's is existing and uploaded previouslu
+                // so we need to mark it for deletion in backend
+                form.fileToDelete.push(file.id);
+            }
+            form.attachments.splice(index, 1);
+        }
+    });
+};
+
 const submit = function () {
-    console.log(form.tasks)
+    console.log(form);
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to update this project?',
@@ -66,11 +97,20 @@ const submit = function () {
         showCancelButton: true,
         confirmButtonText: 'Yes',
     }).then((result) => {
-        form.tasks.forEach((task) => {
-            task.user = task.user ? task.user.id : ''; // store only the ID
-        });
         if (result.isConfirmed) {
-            form.put(route('projects.update', { project: props.project}), {
+            
+            // filter files that is not exist in the database
+            // meaning we only upload the actual files to backend
+            // not this type of file { id: 1, name: 'test.pdf'}
+            // all in all we need to send real files but not those files with only id and name
+            if (form.attachments) {
+                form.attachments = form.attachments.filter(f => !f.id);
+            }
+            
+            form.tasks.forEach((task) => {
+                task.user = task.user ? task.user.id : ''; // store only the ID
+            });
+            form.post(route('projects.update', { project: props.project }), {
                 onSuccess: () => {
                     Swal.fire({
                         title: 'Success',
@@ -78,6 +118,7 @@ const submit = function () {
                         icon: 'success',
                         confirmButtonText: 'OK',
                     });
+                    form.reset();
                 },
                 onError: (error) => {
                     console.log(error);
@@ -89,7 +130,6 @@ const submit = function () {
                     });
                 },
                 onFinish: () => {
-                    form.reset();
                     selectedClient.value = '';
                     selectedUser.value = '';
                 },
@@ -418,8 +458,7 @@ const STATUS = [
                                                 <td class="px-6 py-4">
                                                     {{
                                                         task.user
-                                                            ? task.user
-                                                                  .name
+                                                            ? task.user.name
                                                             : 'TBA'
                                                     }}
                                                 </td>
@@ -436,6 +475,66 @@ const STATUS = [
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    for="attachments"
+                                    value="Choose files to upload"
+                                    class="mt-4 w-40 cursor-pointer rounded-lg bg-blue-500 p-2 text-center text-white"
+                                />
+
+                                <input
+                                    id="attachments"
+                                    type="file"
+                                    class="hidden"
+                                    @change="handleFiles"
+                                />
+
+                                <table class="mt-2 table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="w-64 text-left"
+                                            >
+                                                File
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="w-64 text-left"
+                                            >
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            v-for="(
+                                                file, index
+                                            ) in form.attachments"
+                                            :key="index"
+                                        >
+                                            <td>
+                                                {{ file.name }}
+                                            </td>
+                                            <td>
+                                                <a
+                                                    @click.prevent="
+                                                        removeFile(index)
+                                                    "
+                                                    class="cursor-pointer font-medium text-red-500 hover:underline"
+                                                    >Remove
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <InputError
+                                    v-if="form.errors.attachments"
+                                    class="mt-2"
+                                    :message="form.errors.attachments[0]"
+                                />
                             </div>
 
                             <div class="mt-4 flex items-center justify-end">
