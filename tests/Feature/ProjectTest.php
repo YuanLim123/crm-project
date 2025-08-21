@@ -18,7 +18,7 @@ test('project page is displayed ', function () {
     $response = $this->get(route('projects.index'));
 
     $response->assertStatus(200);
-})->skip();
+});
 
 test('project page contains created project data', function () {
 
@@ -43,7 +43,7 @@ test('project page contains created project data', function () {
         'id' => $project->id,
         'title' => $project->title,
     ]);
-})->skip();
+});
 
 test('project edit contains correct values', function () {
     $this->actingAs($this->user);
@@ -63,13 +63,13 @@ test('project edit contains correct values', function () {
                     ->etc()
             )
     );
-})->skip();
+});
 
 test('project can be updated', function () {
     $this->actingAs($this->user);
     $project = createProject();
 
-    $response = $this->put(route('projects.update', $project), [
+    $response = $this->post(route('projects.update', $project), [
         'title' => 'Updated Project Title',
         'description' => 'Updated description',
         'status' => ProjectStatus::IN_PROGRESS->value,
@@ -85,13 +85,13 @@ test('project can be updated', function () {
         'title' => 'Updated Project Title',
         'description' => 'Updated description',
     ]);
-})->skip();
+});
 
 test('project update validation error redirects back', function () {
     $this->actingAs($this->user);
     $project = createProject();
 
-    $response = $this->put(route('projects.update', $project), [
+    $response = $this->post(route('projects.update', $project), [
         'title' => '',
         'description' => '',
         'status' => '',

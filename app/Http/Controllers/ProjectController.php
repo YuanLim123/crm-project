@@ -13,6 +13,7 @@ use App\Http\Requests\ProjectPostRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use App\Services\ProjectService;
 
 class ProjectController extends Controller
 {
@@ -56,36 +57,9 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProjectPostRequest $request)
+    public function store(ProjectPostRequest $request, ProjectService $projectService)
     {
-        $attributes = $request->validated();
-
-        $project = Project::create([
-            'title' => $attributes['title'],
-            'description' => $attributes['description'],
-            'status' => $attributes['status'],
-            'end_date' => $attributes['endDate'],
-            'client_id' => $attributes['client'],
-            'user_id' => $attributes['assignedUser'],
-        ]);
-
-        if (!empty($attributes['tasks'])) {
-            foreach ($attributes['tasks'] as $task) {
-                $project->tasks()->create([
-                    'title' => $task['title'],
-                    'description' => $task['description'],
-                    'status' => $task['status'],
-                    'end_date' => $task['endDate'],
-                    'user_id' => $task['user'],
-                ]);
-            }
-        }
-
-        if (!empty($attributes['attachments'])) {
-            foreach ($attributes['attachments'] as $attachment) {
-                $project->addMedia($attachment)->toMediaCollection('attachments');
-            }
-        }
+        $projectService->store($request->validated());
 
         return redirect()->route('projects.index');
     }
@@ -159,78 +133,9 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProjectPostRequest $request, Project $project)
+    public function update(ProjectPostRequest $request, Project $project, ProjectService $projectService)
     {
-        $attributes = $request->validated();
-
-        $project->update([
-            'title' => $attributes['title'],
-            'description' => $attributes['description'],
-            'status' => $attributes['status'],
-            'end_date' => $attributes['endDate'],
-            'client_id' => $attributes['client'],
-            'user_id' => $attributes['assignedUser'],
-        ]);
-
-        // initial approach, Delete all old tasks then Create new tasks
-        // $project->tasks()->delete();
-        // foreach ($attributes['tasks'] as $task) {
-        //     $project->tasks()->create([
-        //         'title' => $task['title'],
-        //         'description' => $task['description'],
-        //         'status' => $task['status'],
-        //         'end_date' => $task['endDate'],
-        //         'user_id' => $task['user'],
-        //     ]);
-        // }
-
-        // Sync tasks
-        $oldData = $project->tasks;
-        $newData = $attributes['tasks'] ?? [];
-
-        $partition = $this->updateRelations($oldData, $newData);
-        // Delete removed tasks
-        foreach ($partition['delete'] as $task) {
-            $project->tasks()->where('id', $task['id'])->delete();
-        }
-
-        // Update existing tasks
-        foreach ($partition['update'] as $task) {
-            $project->tasks()->where('id', $task['id'])->update([
-                'title' => $task['title'],
-                'description' => $task['description'],
-                'status' => $task['status'],
-                'end_date' => $task['endDate'],
-                'user_id' => $task['user'],
-            ]);
-        }
-        // Create new tasks
-        foreach ($partition['create'] as $task) {
-            $project->tasks()->create([
-                'title' => $task['title'],
-                'description' => $task['description'],
-                'status' => $task['status'],
-                'end_date' => $task['endDate'],
-                'user_id' => $task['user'],
-            ]);
-        }
-
-        // Handle current file deletions
-        if (!empty($attributes['fileToDelete'])) {
-            foreach ($attributes['fileToDelete'] as $fileId) {
-                $media = $project->getMedia('attachments')->where('id', $fileId)->first();
-                if ($media) {
-                    $media->delete();
-                }
-            }
-        }
-
-        // Handle new file uploads
-        if (!empty($attributes['attachments'])) {
-            foreach ($attributes['attachments'] as $attachment) {
-                $project->addMedia($attachment)->toMediaCollection('attachments');
-            }
-        }
+        $project = $projectService->update($request->validated(), $project);
 
         return redirect()->route('projects.show', $project->id);
     }
@@ -252,29 +157,4 @@ class ProjectController extends Controller
         return response()->download($media->getPath(), $media->file_name);
     }
 
-
-    // https://laracasts.com/discuss/channels/eloquent/update-create-and-delete-hasmany-relations-in-one-go
-    private function updateRelations($oldData, $newData)
-    {
-        $oldIds = Arr::pluck($oldData, 'id');
-        $newIds = Arr::pluck($newData, 'id');
-
-        // groups
-        $delete = collect($oldData)
-            ->filter(function ($model) use ($newIds) {
-                return !in_array($model["id"], $newIds);
-            });
-
-        $update = collect($newData)
-            ->filter(function ($model) use ($oldIds) {
-                return isset($model["id"]) && in_array($model["id"], $oldIds);
-            });
-
-        $create = collect($newData)
-            ->filter(function ($model) {
-                return !isset($model["id"]);
-            });
-        // return
-        return compact('delete', 'update', 'create');
-    }
 }
