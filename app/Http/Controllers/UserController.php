@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewUserRegistered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Inertia\Inertia;
 
 
@@ -55,11 +57,14 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ])->assignRole('user');
+
+        NewUserRegistered::dispatch($user);
+        // event(new Registered($user));
 
         return redirect()->route('users.index');
     }

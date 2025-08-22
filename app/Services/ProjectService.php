@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Helpers\PartitionHelper;
 use Illuminate\Support\Arr;
 
 class ProjectService
@@ -65,7 +66,8 @@ class ProjectService
         $oldData = $project->tasks;
         $newData = $attributes['tasks'] ?? [];
 
-        $partition = $this->updateRelations($oldData, $newData);
+        $partition = PartitionHelper::partition($oldData, $newData);
+
         // Delete removed tasks
         foreach ($partition['delete'] as $task) {
             $project->tasks()->where('id', $task['id'])->delete();
@@ -112,28 +114,4 @@ class ProjectService
         return $project->fresh();
     }
 
-    // https://laracasts.com/discuss/channels/eloquent/update-create-and-delete-hasmany-relations-in-one-go
-    private function updateRelations($oldData, $newData)
-    {
-        $oldIds = Arr::pluck($oldData, 'id');
-        $newIds = Arr::pluck($newData, 'id');
-
-        // groups
-        $delete = collect($oldData)
-            ->filter(function ($model) use ($newIds) {
-                return !in_array($model["id"], $newIds);
-            });
-
-        $update = collect($newData)
-            ->filter(function ($model) use ($oldIds) {
-                return isset($model["id"]) && in_array($model["id"], $oldIds);
-            });
-
-        $create = collect($newData)
-            ->filter(function ($model) {
-                return !isset($model["id"]);
-            });
-        // return
-        return compact('delete', 'update', 'create');
-    }
 }
