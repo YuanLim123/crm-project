@@ -17,7 +17,7 @@ test('authenticated user can access the user page', function () {
     $response = $this->get('/users');
 
     $response->assertStatus(200);
-})->skip();
+});
 
 
 test('unauthenticated user cannot access the user page', function () {
@@ -26,7 +26,7 @@ test('unauthenticated user cannot access the user page', function () {
     $response->assertRedirect('/login');
 
     $response->assertStatus(302);
-})->skip();
+});
 
 
 test('user page contains created user data', function () {
@@ -46,7 +46,7 @@ test('user page contains created user data', function () {
                         ->etc()
                 )
         );
-})->skip();
+});
 
 describe('users', function () {
     beforeEach(function () {
@@ -64,7 +64,7 @@ describe('users', function () {
                     ->has('users.data', 10)
             );
     });
-})->skip();
+});
 
 
 test('admin can delete a user', function () {
@@ -88,7 +88,7 @@ test('user cannot delete another user', function () {
     $response = $this->delete('/users/' . $userToDelete->id);
 
     $response->assertStatus(403);
-})->skip();
+});
 
 
 test('admin can update a user', function () {
@@ -147,6 +147,6 @@ test('create user successful', function () {
 
     $result = User::where('email', $user['email'])->first();
     $this->assertSame($user['name'], $result->name);
-})->skip();
+});
 
 

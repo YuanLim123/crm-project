@@ -89,44 +89,17 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project $project)
+    public function edit(Project $project, ProjectService $projectService)
     {
-        $clients = Client::doesntHave('project')->get();
-        $users = User::all();
-
-        $project->load(['client', 'user', 'tasks.user']);
-
-        $project->tasks->transform(function ($task) {
-            return [
-                'id' => $task->id,
-                'title' => $task->title,
-                'description' => $task->description,
-                'status' => $task->status,
-                // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
-                // to show it in the form
-                'endDate' => Carbon::createFromFormat('d/m/Y', $task->end_date)->format('Y-m-d'),
-                'user' => $task->user,
-            ];
-        });
-
-        // retrive media files
-        $attachments = $project->getMedia('attachments')
-            ->map(function ($file) {
-                return [
-                    'id' => $file->id,
-                    'name' => $file->file_name,
-                ];
-            });
+        $projectEditData = $projectService->prepareDataForEdit($project);
 
         return Inertia::render('Project/Edit', [
-            'clients' => $clients,
-            'users' => $users,
-            'project' => $project,
-            // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
-            // to show it in the form
-            'endDate' => Carbon::createFromFormat('d/m/Y', $project->end_date)->format('Y-m-d'),
-            'status' => ProjectStatus::toArray(),
-            'attachments' => $attachments,
+            'clients' => $projectEditData['clients'],
+            'users' => $projectEditData['users'],
+            'project' => $projectEditData['project'],
+            'endDate' => $projectEditData['endDate'],
+            'status' => $projectEditData['status'],
+            'attachments' => $projectEditData['attachments'],
         ]);
     }
 
@@ -145,7 +118,6 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        dd($project);
         $project->delete();
         
         return redirect()->route('projects.index');

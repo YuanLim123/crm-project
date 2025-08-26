@@ -3,8 +3,13 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\Task;
+use App\Models\User;
+use App\Models\Client;
 use App\Helpers\PartitionHelper;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use App\Enums\ProjectStatus;
 
 class ProjectService
 {
@@ -36,6 +41,48 @@ class ProjectService
                 $project->addMedia($attachment)->toMediaCollection('attachments');
             }
         }
+    }
+
+    public function prepareDataForEdit(Project $project)
+    {
+        $clients = Client::doesntHave('project')->get();
+        $users = User::all();
+
+        $project->load(['client', 'user', 'tasks.user']);
+
+        $project->tasks->transform(function ($task) {
+            return [
+                'id' => $task->id,
+                'title' => $task->title,
+                'description' => $task->description,
+                'status' => $task->status,
+                // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
+                // to show it in the form
+                'endDate' => $this->formatEndDate($task->end_date),
+                'user' => $task->user,
+            ];
+        });
+
+        // retrive media files as id and name only
+        $attachments = $project->getMedia('attachments')
+            ->map(function ($file) {
+                return [
+                    'id' => $file->id,
+                    'name' => $file->file_name,
+                ];
+            });
+
+        return [
+            'clients' => $clients,
+            'users' => $users,
+            'project' => $project,
+            // since we change the accessor for end_date to d/m/Y, we need to format it back to Y-m-d
+            // to show it in the form
+            'endDate' => $this->formatEndDate($project->end_date),
+            'attachments' => $attachments,
+            'status' => ProjectStatus::toArray(),
+        ];
+
     }
 
     public function update(array $attributes, Project $project): Project
@@ -112,6 +159,11 @@ class ProjectService
         }
 
         return $project->fresh();
+    }
+
+    private function formatEndDate(string $endDate)
+    {
+        return Carbon::createFromFormat('d/m/Y', $endDate)->format('Y-m-d');
     }
 
 }
