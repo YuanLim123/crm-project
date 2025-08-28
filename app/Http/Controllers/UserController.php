@@ -62,7 +62,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ])->assignRole('user');
-
+        
         NewUserRegistered::dispatch($user);
         // event(new Registered($user));
 

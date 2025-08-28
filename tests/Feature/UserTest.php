@@ -77,7 +77,8 @@ test('admin can delete a user', function () {
 
     $response->assertStatus(302);
     $response->assertRedirect('/users');
-    $response->assertSoftDeleted($userToDelete);
+
+    $this->assertSoftDeleted($userToDelete);
 });
 
 
@@ -127,6 +128,7 @@ test('user cannot update a user', function () {
 
 test('create user successful', function () {
     $this->actingAs($this->user);
+    createAdminUser();
 
     $user = [
         'name' => 'New User',
